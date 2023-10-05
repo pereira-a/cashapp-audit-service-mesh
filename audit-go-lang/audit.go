@@ -19,10 +19,6 @@ func main() {
 	e := echo.New()
 
 	e.GET("/audit", getAudit)
-
-	// r.HandleFunc("/audit", CreateAudit).
-	// 	Methods("POST")
-
 	e.POST("/audit", CreateAudit)
 
 	e.Logger.Fatal(e.Start(":8080"))
