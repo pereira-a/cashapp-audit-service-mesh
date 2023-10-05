@@ -1,46 +1,51 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 )
 
 type Audit struct {
 	Userid    string
 	Operation string
-	Metadata  string
+	Metadata  string `json:",omitempty"`
 	Timestamp time.Time
 }
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/audit", GetAudit).
-		Methods("GET").
-		Queries("userid", "{userid}")
+	e := echo.New()
 
-	r.HandleFunc("/audit", CreateAudit).
-		Methods("POST")
+	e.GET("/audit", getAudit)
 
-	http.ListenAndServe(":8080", r)
+	// r.HandleFunc("/audit", CreateAudit).
+	// 	Methods("POST")
+
+	e.POST("/audit", CreateAudit)
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
-func GetAudit(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+func getAudit(c echo.Context) error {
 	audit := Audit{
 		Userid:    "testUser",
 		Operation: "sendMoney",
 		Timestamp: time.Now(),
 	}
 
-	json.NewEncoder(w).Encode(audit)
+	userId := c.QueryParam("userid")
+	fmt.Printf("Requested audit for userId=%s\n", userId)
+	return c.JSON(http.StatusOK, audit)
 }
 
-func CreateAudit(w http.ResponseWriter, r *http.Request) {
-	var user Audit
-	json.NewDecoder(r.Body).Decode(&user)
-	fmt.Fprintf(w, "Received Audit: %s - %s - %s - %s", user.Userid, user.Operation, user.Metadata, user.Timestamp)
+func CreateAudit(c echo.Context) error {
+	audit := new(Audit)
+	if err := c.Bind(audit); err != nil {
+		return err
+	}
+
+	fmt.Printf("Received Audit: %s - %s - %s - %s\n", audit.Userid, audit.Operation, audit.Metadata, audit.Timestamp)
+	return c.JSON(http.StatusCreated, audit)
 }
