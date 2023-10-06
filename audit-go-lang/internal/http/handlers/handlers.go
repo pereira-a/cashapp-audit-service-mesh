@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"fmt"
@@ -15,16 +15,7 @@ type Audit struct {
 	Timestamp time.Time
 }
 
-func main() {
-	e := echo.New()
-
-	e.GET("/audit", getAudit)
-	e.POST("/audit", CreateAudit)
-
-	e.Logger.Fatal(e.Start(":8080"))
-}
-
-func getAudit(c echo.Context) error {
+func GetAudit(c echo.Context) error {
 	audit := Audit{
 		Userid:    "testUser",
 		Operation: "sendMoney",
