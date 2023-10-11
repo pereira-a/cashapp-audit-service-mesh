@@ -23,12 +23,25 @@ func New(auditRepo auditRepository) *AuditService {
 }
 
 func (s AuditService) GetAuditsByUserId(userid string) []model.Audit {
-	// s.repo.FindByUserId(userid)
-	fmt.Println("Test this organization!")
-	return nil
+	var eAudits = s.repo.FindByUserId(userid)
+	var mAudits []model.Audit
+	for _, eAudit := range eAudits {
+		mAudits = append(mAudits, fromEntityToModel(eAudit))
+	}
+	fmt.Printf("Test this organization => %s", mAudits)
+	return mAudits
 }
 
 func (s AuditService) CreateAudit(model model.Audit) string {
 	// TODO
 	return ""
+}
+
+func fromEntityToModel(entity repository.Audit) model.Audit {
+	return model.Audit{
+		Userid:    entity.Userid,
+		Operation: entity.Operation,
+		Metadata:  entity.Metadata,
+		Timestamp: entity.Timestamp,
+	}
 }

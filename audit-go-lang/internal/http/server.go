@@ -23,10 +23,11 @@ type auditService interface {
 	CreateAudit(model model.Audit) string
 }
 
-var logic auditService = service.New(repository.New())
+var logic auditService
 
 func ListenAndServe() {
 	e := echo.New()
+	logic = service.New(repository.New())
 
 	e.GET("/audit", GetAudit)
 	e.POST("/audit", CreateAudit)
@@ -35,16 +36,10 @@ func ListenAndServe() {
 }
 
 func GetAudit(c echo.Context) error {
-	audit := Audit{
-		Userid:    "testUser",
-		Operation: "sendMoney",
-		Timestamp: time.Now(),
-	}
-
-	logic.GetAuditsByUserId("test")
-
 	userId := c.QueryParam("userid")
 	fmt.Printf("Requested audit for userId=%s\n", userId)
+
+	audit := logic.GetAuditsByUserId(userId)
 	return c.JSON(http.StatusOK, audit)
 }
 

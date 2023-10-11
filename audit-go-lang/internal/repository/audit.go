@@ -15,18 +15,20 @@ type Audit struct {
 }
 
 type AuditRepository struct {
-	DB *gorm.DB
+	DB_CONN *gorm.DB
 }
 
 func New() *AuditRepository {
+	println(DB)
 	return &AuditRepository{
-		DB: DB,
+		DB_CONN: DB,
 	}
 }
 
 func (r AuditRepository) FindByUserId(userid string) []Audit {
+	// println(test)
 	var audits []Audit
-	r.DB.Where("userid = ?", userid).Find(&audits)
+	r.DB_CONN.Where("userid = ?", userid).Find(&audits)
 	return audits
 }
 

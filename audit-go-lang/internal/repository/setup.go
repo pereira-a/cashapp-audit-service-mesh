@@ -14,8 +14,7 @@ func ConnectDatabase() {
 
 	// TODO: use env vars
 	dsn := "host=localhost user=postgres password=password dbname=auditDB port=5432 sslmode=disable"
-	db, error := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
+	var db, error = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if error != nil {
 		panic(fmt.Sprintf("Error init DB: %s\n", error.Error()))
 	} else {
@@ -23,7 +22,7 @@ func ConnectDatabase() {
 	}
 
 	DB = db
-
 	// Auto migration
 	DB.AutoMigrate(&Audit{})
+	println(DB)
 }
